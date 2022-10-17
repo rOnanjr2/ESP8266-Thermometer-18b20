@@ -1,9 +1,5 @@
 "use strict";
 
-
-const graphStr = "71,71,71,71,71,70,70,70,70,69,70,69,70,69,70,69,70,70,70,70,70,69,68,68,68,68,69,68,68,68,68,68,68,68,68,68,68,68,67,68,68,68,68,67,66,66,66,66,67,66,66,66,66,66,66,66,65,65,64,64,65,64,64,63,63,63,63,63,63,63,63,62,62,61,61,60,60,60,61,60,60,59,60,60,58,58,57,57,56,57,58,58,58,58,58,57,58,57,57,57,58,57,57,56,57,56,56,56,56,56,56,55,56,56,56,55,55,54,55,55,55,55,55,55,55,55,55,55,55,55,55,55,55,55,54,55,55,54,55,54,55,54,54,54,55,54,54,54,54,53,55,55,55,55,55,54,54,55,55,55,54,54,55,54,55,55,54,53,53,53,53,53,53,53,53,53,53,54,53,53,53,53,53,52,53,53,54,54,54,54,54,55,55,55,55,55,55,55,55,55,55,56,56,56,56,56,55,55,55,55,55,55,55,54,55,55,54,54,54,53,53,54,54,53,53,53,53,52,52,51,51,51,51,51,51,51,51,51,51,51,51,50,50,50,50,50,49,49,50,48,48,48,48,48,47,48,48,48,48,48,49,48,48,49,49,50,49,49,50,49,48,49,49,50,50,50,50,51,49,49,49,50,50,50,50,49,49,49,48,49,48,48,48,49,49,49,49,49,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,47,46,47,46,46,46,48,47,47,48,48,48,48,48,48,48,48,48,48,48,48,47,47,48,47,47,48,48,46,46,46,46,46,46,46,46,46,46,46,45,45,45,46,45,45,45,45,45,44,45,45,44,45,44,44,44,44,44,44,44,43,44,45,44,43,43,43,43,43,43,42,43,44,44,44,44,45,45,45,45,45,45,44,43,43,43,41,41,41,41,41,41,41,41,41,41,41,41,40,40,40,40,38,38,38,40,39,39,39,39,40,40,40,40,40,40,40,40,40,40,40,40,39,40,40,40,40,40,39,39,38,39,39,38,39,38,38,38,39,38,38,38,38,38,38,38,38,38,38,38,38,38,38,38,37,37,37,37,36,36,36,36,36,36,36,36,36,35,35,35,35,35,35,35,34,35,35,34,33,33,33,33,33,33,33,33,33,33,33,33,32,33,32,32,32,31,32,31,31,31,31,32,31,31,31,30,30,30,30,30,30,30,29,29,28,28,28,30,29,29,30,29,30,31,31,31,31,31,30,31,31,31,31,31,30,31,31,30,30,30,30,30,30,31,31,31,31,31,31,31,31,32,32,31,31,32,31,32,32,32,33,33,33,33,33,33,33,33,33,33,33,33,34,34,35,35,36,36,35,35,35,35,36,36,37,38,38,38,38,38,38,38,38,39,40,40,39,40,40,40,41,41,42,42,42,43,43,43,43,43,45,45,45,46,46,46,46,47,47,48,49,49,50,49,50,50,51,51,51,53,52,52,53,54,54,54,55,55,55,56,56,56,56,57,57,58,58,58,59,59,60,60,60,60,61,61,63,63,63,63,64,64,65,65,66,66,66,66,67,67,67,68,68,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,686";
-const tempStr = "85.50";
-
 (function () {
   const settings = {
     graphRefreshPeriod: 5, //seconds
@@ -17,7 +13,7 @@ const tempStr = "85.50";
   const datasetShifted = [];
   let graphPointer;
 
-  let opts = {
+  const opts = {
     angle: -0.25,
     lineWidth: 0.2,
     radiusScale: 0.9,
@@ -113,57 +109,44 @@ const tempStr = "85.50";
     }
   };
 
-  const drawTemp = (response) => {
-    const element = document.getElementById("temp_text");
-    element.innerHTML = response;
-    gauge.set(response);
-  };
-
-  const requestTemp = () => {
+  const draw_temp = () => {
     const request = new XMLHttpRequest();
     request.open("GET", "/temperature", true);
     request.onload = function () {
       if (request.readyState == 4 && request.status == 200) {
-        drawTemp(request.responseText);
+        const response = request.responseText;
+        const element = document.getElementById("temp_text");
+        element.innerHTML = response;
+        gauge.set(response);
       }
     };
     request.send();
   };
 
-
-
-  const drawGraph = (response) => {
-    dataset = response.split(",").map(function (str) {
-      return parseInt(str) / 10;
-    });
-    graphPointer = Number(dataset.pop()) * 10;
-    shift();
-    chart.updateSeries([{ data: datasetShifted }]);
-  }
-
-
-
-
-  const requestGraph = () => {
+  const draw_graph = () => {
     const request = new XMLHttpRequest();
     request.open("GET", "/graph", true);
     request.onload = function () {
       if (request.readyState == 4 && request.status == 200) {
-        draw_graph(request.responseText);
+        const response = request.responseText;
+        dataset = response.split(",").map(function (str) {
+          return parseInt(str) / 10;
+        });
+        graphPointer = Number(dataset.pop()) * 10;
+        shift();
+        chart.updateSeries([{ data: datasetShifted }]);
       }
     };
     request.send();
   };
 
   const refresh = () => {
-    // requestTemp();
-    // requestGraph();
-    drawGraph(graphStr);
-    drawTemp(tempStr);
+    draw_temp();
+    draw_graph();
   };
 
-  // setInterval(requestTemp, settings.tempRefreshPeriod * 1000);
-  // setInterval(requestGraph, settings.graphRefreshPeriod * 1000);
+  setInterval(draw_temp, settings.tempRefreshPeriod * 1000);
+  setInterval(draw_graph, settings.graphRefreshPeriod * 1000);
 
   document.addEventListener("DOMContentLoaded", refresh);
 
@@ -183,7 +166,6 @@ const tempStr = "85.50";
       darkTheme = localStorage.getItem(storageKey);
       darkTheme = darkTheme === "true" ? true : false;
       console.log(darkTheme);
-      console.log(opts);
       if (darkTheme) {
         docBody.classList.toggle("dark");
 
