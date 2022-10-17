@@ -126,8 +126,8 @@ h1 {
 	color: white;
 }
 .theme-toggle{
-    width: 7ex;
-    height: 7ex;
+    width: 5ex;
+    height: 5ex;
     border-radius: 1ex;
     border-color: #333333;
     display: flex;
