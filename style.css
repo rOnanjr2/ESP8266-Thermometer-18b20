@@ -135,13 +135,14 @@ h1 {
     justify-content: space-around;
 	background-color: black;
 }
-.theme-toggle .sun{
-	color:black;
+.theme-toggle .sun, .theme-toggle .moon{
+  width: 90%;
+  /* color:black; */
 }
-.theme-toggle .moon{
-	margin: 0 0 0.3ex;
-	color:white;
-}
+/* .theme-toggle .moon{ */
+	/* margin: 0 0 0.3ex; */
+	/* color:white; */
+/* } */
 
 .dark .theme-toggle {
 	background-color: white;
