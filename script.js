@@ -13,6 +13,7 @@
     graphYAxisMin: 0, //degrees
     graphYAxisMax: 30, //degrees
     graphYAxisDecimals: 0, //digits
+    intervalsSetted: false
   };
 
   let dataset = [];
@@ -155,6 +156,7 @@
     let graphPointer = Number(dataset.pop()) * 10;
     settings.tempRefresh = tempRefreshPeriod;
     settings.graphRefreshPeriod = tempRefreshPeriod * graphWriteDivider;
+    setIntervals();
     shift(graphPointer);
     appendDates(graphWriteDivider * tempRefreshPeriod);
     chart.updateSeries([{ data: datesTempArr }]);
@@ -181,11 +183,19 @@
 
   document.addEventListener("DOMContentLoaded", refresh);
 
-  setTimeout(function(){
-    setInterval(requestTemp, settings.tempRefresh * 1000);
-    setInterval(requestGraph, settings.graphRefreshPeriod * 1000);
-  },10000);
+  // setTimeout(function(){
+    
+  // },10000);
 
+
+
+  const setIntervals = () => {
+    if (!settings.intervalsSetted) {
+      setInterval(requestTemp, settings.tempRefresh * 1000);
+      setInterval(requestGraph, settings.graphRefreshPeriod * 1000);
+      settings.intervalsSetted = true;
+    }
+  }
 
   // ############################# темы здесь
   const storageKey = "dark-theme-choosed";
