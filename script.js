@@ -118,10 +118,10 @@
         // console.log(tempNum);
       }
     };
-    // request.onerror = function () {
-    //   // setGauge(tempStr); // set gauge value
-    //   setGauge(tempNum);
-    // };
+    request.onerror = function () {
+      // setGauge(tempStr); // set gauge value
+      setGauge(tempNum, gaugeMode);
+    };
     request.send();
   };
 
