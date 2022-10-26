@@ -318,29 +318,31 @@
     // 588.7 = 0%;  0 = 100%
     const gaugeArcLine = document.getElementById("progress-blue-circle");
     const gaugeParts = gaugeArcLine.querySelectorAll("circle");
-    let color = `rgb(${num + 50} ${255 - (num + 50)} ${0})`;
 
     gaugeParts.forEach((elem) => {
-      elem.style.stroke = color;
-      console.log(color);
-
       if (gaugeMode === 2) {
         // ************** for 20 - 100 mode
         elem.style.strokeDashoffset = `${588.7 - (588.7 / 80) * (num - 20)}`;
-        // elem.style.stroke = color;
-        // console.log(color);
+        let color = `hsl(${(90 - num) * 5}deg 100% 50%)`;
+        if (num < 40) {
+          elem.style.stroke = "hsl(250deg 100% 50%)";
+        }else if (num < 90) {
+          elem.style.stroke = color;
+        }else {
+          elem.style.stroke = "hsl(0deg 100% 50%)";
+        }
       }
       if (gaugeMode === 1) {
         // ************** for -50 - 50 mode
         elem.style.strokeDashoffset = `${588.7 - (588.7 / 100) * (num + 50)}`;
-        // ************** gauge arc color set
-        // elem.style.stroke = `${"#00ff00"}`;
-        
-        // elem.style.stroke = color;
-        // console.log(color);
-
-        // "rgb(" + 255 + 255 + 255 + ")";
-
+        let color = `hsl(${(40 - num) * 4.3}deg 100% 50%)`;
+        if (num < -17) {
+          elem.style.stroke = "hsl(245deg 100% 50%)";
+        }else if (num < 40) {
+          elem.style.stroke = color;
+        }else {
+          elem.style.stroke = "hsl(0deg 100% 50%)";
+        }
       }
     });
   };
