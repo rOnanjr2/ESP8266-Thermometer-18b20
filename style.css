@@ -1,106 +1,31 @@
+/* font for svg numbers */
+@font-face {
+  font-family: "Goldman";
+  src: url("./Goldman-Regular.ttf");
+}
+
 html {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Goldman", sans-serif;
   display: block;
   margin: 0px auto;
   text-align: center;
   color: #333333;
 }
 body {
-   margin: 0px auto; 
-   max-width: 1280px; 
+  margin: 0px auto;
+  max-width: 1280px;
 }
 h1 {
-  margin: -30px auto -10px;
-}
-
-.side-by-side {
-  display: inline-block;
-  vertical-align: middle;
-  position: relative;
-  margin-top: -10vh;
-  z-index: -1;
-  /* margin-top: calc(100% - 100px); */
-}
-
-.humidity-icon {
-  background-color: #3498db;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  line-height: 36px;
-}
-.humidity-text {
-  font-weight: 600;
-  padding-left: 15px;
-  font-size: 19px;
-  width: 160px;
-  text-align: left;
-}
-.humidity {
-  font-weight: 300;
-  font-size: 60px;
-  color: #3498db;
-}
-.temperature-icon {
-  background-color: #f39c12;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  line-height: 40px;
-}
-.temperature-text {
-  font-weight: 600;
-  padding-left: 15px;
-  font-size: 19px;
-  width: 160px;
-  text-align: left;
-}
-.temperature {
-  font-weight: 300;
-  font-size: 60px;
-  color: #f39c12;
-}
-.superscript {
-  font-size: 19px;
-  font-weight: 600;
-}
-/*.data{padding: 10px;}*/
-
-
-.relay_on {
-  background-color: red;
-}
-
-.relay_off {
-  background-color: blue;
-}
-
-.gauge-meter {
-  width: 350px;
-  height: 350px;
-  margin: 0px auto;
-  z-index: -2;
-  /*border: 1px solid #000;*/
-  /*margin: 0 auto;*/
-}
-
-/* .temperature { */
-  /* position: absolute; */
-  /* margin: 0px auto; */
-  /* left: 131px; */
-  /* top: 312px; */
-  /*border: 1px solid #000;*/
-/* } */
-
-#webpage{
-	display: flex;
-	flex-direction: column;
+  margin: -30px auto 0;
 }
 
 
-
+#webpage {
+  display: flex;
+  flex-direction: column;
+}
 #chart {
-  width:100%;
+  width: 100%;
   margin: 0px auto;
   /* background-color: #2b2b2b; */
 }
@@ -112,51 +37,116 @@ h1 {
   fill: #ff6206;
 }
 
-
-
-
-
-
-
-/* темы здесь */
-
+/* theme switch */
 /* https://web.dev/building-a-theme-switch-component/ */
 .dark {
-	background: black;
-	color: white;
+  background: #333333;
+  color: white;
 }
-.theme-toggle{
-    width: 5ex;
-    height: 5ex;
-    border-radius: 1ex;
-    border-color: #333333;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-	background-color: black;
+.theme-toggle {
+  opacity:0.5;
+  max-width: 50px;
+  max-height: 50px;
+  width: 9vw;
+  height: 9vw;
+  border-radius: 0 0 1ex 0;
+  border:none;
+  /* border: 2px #b3b3b3 solid;
+  border-top: none;
+  border-left: none; */
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: rgb(32, 32, 32);
+  cursor: pointer;
 }
-.theme-toggle .sun, .theme-toggle .moon{
+.theme-toggle:hover{
+  opacity:1;
+}
+.theme-toggle .sun,
+.theme-toggle .moon {
   width: 90%;
   /* color:black; */
 }
-/* .theme-toggle .moon{ */
-	/* margin: 0 0 0.3ex; */
-	/* color:white; */
-/* } */
-
 .dark .theme-toggle {
-	background-color: white;
+  background-color: #164485;
 }
-.theme-toggle span{
-	font-size: 4.5ex;
+.theme-toggle span {
+  font-size: 4.5ex;
 }
-.dark .sun, .moon{
-	display:inline;
+.dark .sun,
+.moon {
+  display: inline;
 }
-.dark .moon, .sun{
-	display: none;
+.dark .moon,
+.sun {
+  display: none;
 }
 
-.dark .apexcharts-xaxis-texts-g{
-	color: #dadada
+.dark .apexcharts-xaxis-texts-g {
+  color: #dadada;
+}
+
+/* gauge background svg */
+.gauge-container {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  max-width: 500px;
+  cursor: pointer;
+  /* margin: 0 auto; */
+  /* display: flex;
+  flex-direction: row;
+  align-items:center; */
+}
+svg {
+  display:block;
+  font-family: "Goldman";
+}
+svg #red-glow {
+  opacity: 1;
+}
+.the-temperature {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 90pt;
+  color: white;
+  margin: 0;
+  user-select: none;
+  /* condensing width of the numbers */
+  transform: scale(0.7, 1);
+}
+/* the glowing progress */
+svg #progress-blue-circle {
+  transform-origin: center;
+  transform: rotate(30deg);
+}
+/* DO NOT DELETE */
+svg #progress-blue-circle circle {
+  /* circle radius in svg = 140.5 */
+  /* 140.5 * 2 * 3,141592654 = 883 */
+  stroke-dasharray: 883;
+  /* for the full 360 circle */
+  /* stroke-dashoffset: calc(883 - (883 * var(--num)) / 100); */
+  /* for the  270 arc + 120 arc:  */
+  /* 883/360*120 = 294,3*/
+  /* 883-294,3 = 588,7*/
+  /* 120 - for the "20-100" */
+  /* stroke-dashoffset: calc((588.7 - (588.7 * var(--num)) / 100)); */
+}
+/* DO NOT DELETE */
+svg #white-arrow {
+  /* the range 0-240 deg */
+ transform-origin: center;
+  /* transform: rotate(calc(240deg / 100 * var(--num))); */
+}
+
+@media (max-width: 550px) {
+  .the-temperature {
+    font-size: 24vmin;
+  }
 }
