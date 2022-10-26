@@ -94,7 +94,7 @@ h1 {
   width: 80%;
   max-width: 500px;
   cursor: pointer;
-  /* margin: 0 auto; */
+  margin: 0 0 5px;
   /* display: flex;
   flex-direction: row;
   align-items:center; */
@@ -102,9 +102,6 @@ h1 {
 svg {
   display:block;
   font-family: "Goldman";
-}
-svg #red-glow {
-  opacity: 1;
 }
 .the-temperature {
   position: absolute;
@@ -147,6 +144,6 @@ svg #white-arrow {
 
 @media (max-width: 550px) {
   .the-temperature {
-    font-size: 24vmin;
+    font-size: 21vmin;
   }
 }
