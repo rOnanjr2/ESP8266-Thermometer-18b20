@@ -40,7 +40,7 @@ h1 {
 /* theme switch */
 /* https://web.dev/building-a-theme-switch-component/ */
 .dark {
-  background: #333333;
+  background: #000;
   color: white;
 }
 .theme-toggle {
@@ -91,7 +91,7 @@ h1 {
 .gauge-container {
   position: relative;
   align-self: center;
-  width: 100%;
+  width: 80%;
   max-width: 500px;
   cursor: pointer;
   /* margin: 0 auto; */
