@@ -19,7 +19,6 @@ h1 {
   margin: -30px auto 0;
 }
 
-
 #webpage {
   display: flex;
   flex-direction: column;
@@ -44,13 +43,13 @@ h1 {
   color: white;
 }
 .theme-toggle {
-  opacity:0.5;
+  opacity: 0.5;
   max-width: 50px;
   max-height: 50px;
   width: 9vw;
   height: 9vw;
   border-radius: 0 0 1ex 0;
-  border:none;
+  border: none;
   /* border: 2px #b3b3b3 solid;
   border-top: none;
   border-left: none; */
@@ -59,9 +58,10 @@ h1 {
   justify-content: space-around;
   background-color: rgb(32, 32, 32);
   cursor: pointer;
+  transition: 0.5s ease-out;
 }
-.theme-toggle:hover{
-  opacity:1;
+.theme-toggle:hover {
+  opacity: 1;
 }
 .theme-toggle .sun,
 .theme-toggle .moon {
@@ -100,7 +100,7 @@ h1 {
   align-items:center; */
 }
 svg {
-  display:block;
+  display: block;
   font-family: "Goldman";
 }
 .the-temperature {
@@ -138,7 +138,7 @@ svg #progress-blue-circle circle {
 /* DO NOT DELETE */
 svg #white-arrow {
   /* the range 0-240 deg */
- transform-origin: center;
+  transform-origin: center;
   /* transform: rotate(calc(240deg / 100 * var(--num))); */
 }
 

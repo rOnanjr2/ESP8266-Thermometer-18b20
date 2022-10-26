@@ -318,15 +318,15 @@
     gaugeParts.forEach((elem) => {
       if (gaugeMode === 2) {
         // ************** for 20 - 100 mode
-        elem.style = `stroke-dashoffset: ${588.7 - (588.7 / 80) * (num - 20)};`;
+        elem.style.strokeDashoffset = `${588.7 - (588.7 / 80) * (num - 20)}`;
       }
       if (gaugeMode === 1) {
         // ************** for -50 - 50 mode
-        elem.style = `stroke-dashoffset: ${
+        elem.style.strokeDashoffset = `${
           588.7 - (588.7 / 100) * (num + 50)
-        };`;
+        }`;
         // ************** gauge arc color set
-
+        elem.style.stroke = `${"#00ff00"}`;
 
       }
     });
