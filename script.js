@@ -9,6 +9,7 @@
   const tempStr = "22.53";
   let tempNum = parseFloat(tempStr);
   let gaugeMode = 1;
+  const slider = document.getElementById('tempSlider');
 
   // ********************************************
   //  offline demo section end
@@ -112,10 +113,12 @@
       if (request.readyState == 4 && request.status == 200) {
         tempNum = parseFloat(request.responseText);
         setGauge(tempNum, gaugeMode);
+        slider.style.display = 'none';
       }
     };
     request.onerror = function () {
       setGauge(tempNum, gaugeMode);
+      slider.style.display = 'block';
     };
     request.send();
   };
@@ -361,12 +364,9 @@
   };
 
 
-  const slider = document.getElementById('tempSlider');
-
   slider.oninput = function() {
     tempNum = parseFloat(this.value);
     setGauge(tempNum, gaugeMode);
-    console.log(tempNum);
   }
 
 

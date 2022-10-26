@@ -142,6 +142,10 @@ svg #white-arrow {
   /* transform: rotate(calc(240deg / 100 * var(--num))); */
 }
 
+#tempSlider {
+  display: none;
+}
+
 @media (max-width: 550px) {
   .the-temperature {
     font-size: 21vmin;
