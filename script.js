@@ -335,9 +335,9 @@
     });
   };
 
-  document.querySelector(".gauge-container").addEventListener("click", () => {
+  document.querySelector(".gauge-container").onclick = () => {
     gaugeMode === 2 ? setGauge(tempNum, 1) : setGauge(tempNum, 2);
-  });
+  };
 
   const setGauge = (temp, mode) => {
     // ************ automatic gaugeMode set start
