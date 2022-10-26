@@ -122,6 +122,10 @@ svg #progress-blue-circle {
   transform-origin: center;
   transform: rotate(30deg);
 }
+/* glowing strength */
+svg #progress-blue-circle:nth-child(1){
+  stroke-width: 7px;
+}
 /* DO NOT DELETE */
 svg #progress-blue-circle circle {
   /* circle radius in svg = 140.5 */
