@@ -349,6 +349,7 @@
 
   document.querySelector(".gauge-container").onclick = () => {
     gaugeMode === 2 ? setGauge(tempNum, 1) : setGauge(tempNum, 2);
+    refresh();
   };
 
   const setGauge = (temp, mode) => {
