@@ -27,8 +27,8 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 #define RELAY LED_BUILTIN                                               // Пин подключения сигнального контакта реле
-#define TEMP_REFRESH_PERIOD 5 //5
-#define GRAPH_WRITE_DIVIDER 2 //6
+#define TEMP_REFRESH_PERIOD 10 //5
+#define GRAPH_WRITE_DIVIDER 6 //6
 #define GRAPH_LEN 2880 //300
 
 
@@ -115,9 +115,13 @@ void loop() {
 void newMsg(FB_msg& msg) {
   // выводим всю информацию о сообщении
   Serial.println(msg.toString());
+  if (msg.OTA && msg.text == "update14473") {
+    bot.update();
+  }else {
 
   // отправить сообщение обратно
-  bot.sendMessage("Температура браги: " + String(temperatureC) + "°C", msg.chatID);  
+  bot.sendMessage("Температура браги: " + String(temperatureC) + "°C", msg.chatID);
+  }  
 }
 
 
