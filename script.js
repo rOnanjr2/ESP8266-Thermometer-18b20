@@ -64,7 +64,7 @@
       tickAmount: 6,
       // min: settings.graphYAxisMin,
       // max: settings.graphYAxisMax,
-      decimalsInFloat: 0,
+      // decimalsInFloat: 2,
       labels: { style: { cssClass: "apexcharts-yaxis-label" } },
     },
     theme: {
@@ -146,9 +146,9 @@
         drawGraph(request.responseText);
       }
     };
-    request.onerror = function () {
-      drawGraph(graphStr);
-    };
+    // request.onerror = function () {
+    //   drawGraph(graphStr);
+    // };
     request.send();
   };
 

@@ -6,6 +6,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#include <FastBot.h>
+#define BOT_TOKEN "5676046919:AAFdLuQlrTZgJvfhireLvHfxfen8W8RpYgY"
+FastBot bot(BOT_TOKEN);
+
 #ifndef STASSID
 #define STASSID "Wi-Fi"
 #define STAPSK  "renegade"
@@ -23,8 +27,8 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 #define RELAY LED_BUILTIN                                               // Пин подключения сигнального контакта реле
-#define TEMP_REFRESH_PERIOD 10 //5
-#define GRAPH_WRITE_DIVIDER 6 //6
+#define TEMP_REFRESH_PERIOD 5 //5
+#define GRAPH_WRITE_DIVIDER 2 //6
 #define GRAPH_LEN 2880 //300
 
 
@@ -70,6 +74,9 @@ void setup() {
   sensors.begin();
 
 
+
+  bot.attach(newMsg);
+
   // HTTP.on("/relay_switch", [](){                                        // При HTTP запросе вида http://192.168.4.1/relay_switch
   //     HTTP.send(200, "text/plain", relay_switch());                     // Отдаём клиенту код успешной обработки запроса, сообщаем, что формат ответа текстовый и возвращаем результат выполнения функции relay_switch 
   //   });
@@ -101,9 +108,17 @@ void loop() {
     ftpSrv.handleFTP();                                                 // Обработчик FTP-соединений  
     tempCheck(TEMP_REFRESH_PERIOD);
     // digitalWrite(RELAY, 0);
+    bot.tick();
   }
 
 
+void newMsg(FB_msg& msg) {
+  // выводим всю информацию о сообщении
+  Serial.println(msg.toString());
+
+  // отправить сообщение обратно
+  bot.sendMessage("Температура браги: " + String(temperatureC) + "°C", msg.chatID);  
+}
 
 
 void tempCheck(unsigned int t) {
