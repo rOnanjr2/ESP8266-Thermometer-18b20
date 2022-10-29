@@ -51,12 +51,6 @@ void setup() {
   WiFi.begin(ssid, password);
   Serial.println("");
 
-
-  // for (int i = 0; i < GRAPH_LEN; ++i) {
-  //   graphData[i] = 2000;
-  // };
-
-
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -115,15 +109,20 @@ void loop() {
 void newMsg(FB_msg& msg) {
   // выводим всю информацию о сообщении
   Serial.println(msg.toString());
-  if (msg.OTA && msg.text == "update14473") {
+  // if (msg.OTA && msg.text == "update14473") {
+  if (msg.OTA) {
     bot.update();
+  }else if (msg.text.substring(0, 5) == "spirt") {
+    uint8_t a = msg.text.substring(6, 8).toInt();
+    uint8_t b = msg.text.substring(9, 11).toInt();
+    float result = a + (20 - b) * 0.3;
+    bot.sendMessage("содержание спирта: " + String(result) + " %об.", msg.chatID);
   }else {
 
   // отправить сообщение обратно
-  bot.sendMessage("Температура браги: " + String(temperatureC) + "°C", msg.chatID);
+  bot.sendMessage("Температура на датчике 1: " + String(temperatureC) + "°C", msg.chatID);
   }  
 }
-
 
 void tempCheck(unsigned int t) {
       digitalWrite(RELAY, 0);
