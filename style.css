@@ -94,10 +94,11 @@ h1 {
   width: 80%;
   max-width: 500px;
   cursor: pointer;
-  margin: 0 0 5px;
+  margin: 0 0 3vh;
   /* display: flex;
   flex-direction: row;
   align-items:center; */
+
 }
 svg {
   display: block;
@@ -145,6 +146,21 @@ svg #white-arrow {
   transform-origin: center;
   /* transform: rotate(calc(240deg / 100 * var(--num))); */
 }
+.gauge_block{
+  position: relative;
+}
+/* // gauge buttons */
+#gauge_btns {
+  position: absolute;
+  z-index: 11;
+transform: translateY(-80%);
+}
+
+#refresh-icon:hover > #btn-rt, #btn-lb:hover, #btn-lt:hover, #btn-rb:hover{
+  fill: #444 !important;
+}
+
+
 
 #tempSlider {
   display: none;
