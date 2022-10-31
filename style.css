@@ -94,11 +94,10 @@ h1 {
   width: 80%;
   max-width: 500px;
   cursor: pointer;
-  margin: 0 0 3vh;
+  /* margin: 0 0 3vh; */
   /* display: flex;
   flex-direction: row;
   align-items:center; */
-
 }
 svg {
   display: block;
@@ -124,7 +123,7 @@ svg #progress-blue-circle {
   transform: rotate(30deg);
 }
 /* glowing strength */
-svg #progress-blue-circle:nth-child(1){
+svg #progress-blue-circle:nth-child(1) {
   stroke-width: 7px;
 }
 /* DO NOT DELETE */
@@ -146,20 +145,44 @@ svg #white-arrow {
   transform-origin: center;
   /* transform: rotate(calc(240deg / 100 * var(--num))); */
 }
-.gauge_block{
+.gauge_block {
   position: relative;
 }
 /* // gauge buttons */
-#gauge_btns {
-  position: absolute;
-  z-index: 11;
-transform: translateY(-80%);
+.buttons-container {
+  background-color: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.buttons-container .btn-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.buttons-container button {
+  background-color: #1b1b1b;
+  color: #dadada;
+  display: block;
+  width: 50%;
+  height: 5vmin;
+  font-size: 3vmin;
 }
 
-#refresh-icon:hover > #btn-rt, #btn-lb:hover, #btn-lt:hover, #btn-rb:hover{
-  fill: #444 !important;
+.buttons-container button:hover,
+.buttons-container :not(img) {
+  background-color: #1b1b1b;
 }
-
+.buttons-container button:active {
+  background-color: #535353;
+}
+#refresh-icon img{
+ height: 90%;
+ transition: 0.5s;
+}
+#refresh-icon:active img{
+  transform: rotate(-180deg);
+}
 
 
 #tempSlider {
