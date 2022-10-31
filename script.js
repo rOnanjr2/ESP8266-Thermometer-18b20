@@ -159,10 +159,6 @@
 
   document.addEventListener("DOMContentLoaded", refresh);
 
-  // setTimeout(function(){
-
-  // },10000);
-
   const setIntervals = () => {
     if (!settings.intervalsSetted) {
       setInterval(requestTemp, settings.tempRefresh * 1000);
@@ -192,12 +188,6 @@
       console.log("darkTheme", darkTheme);
       if (darkTheme) {
         docBody.classList.toggle("dark");
-
-        //####################### changing colors of the OLD gauge
-        // opts.pointer.color = "#dadada";
-        // opts.staticLabels.color = "#dadada";
-        // gauge.setOptions(opts);
-
         //####################### changing theme of the graph
         chart.updateOptions({
           theme: {
@@ -210,19 +200,11 @@
   };
 
   const themeToggle = () => {
-    // console.log(darkTheme);
     docBody.classList.toggle("dark");
     darkTheme = !darkTheme;
     saveStateToLocalStorage();
 
     if (docBody.classList.contains("dark")) {
-      //####################### changing colors of the OLD gauge
-
-      // opts.pointer.color = "#dadada";
-      // opts.staticLabels.color = "#dadada";
-      // gauge.setOptions(opts);
-
-      //https://apexcharts.com/docs/methods/#updateOptions
       chart.updateOptions({
         theme: {
           mode: "dark",
@@ -230,14 +212,6 @@
         chart: { background: "#101010" },
       });
     } else {
-      //####################### changing colors of the OLD gauge
-
-      // opts.pointer.color = "#000";
-      // opts.staticLabels.color = "#000";
-      // gauge.setOptions(opts);
-
-      // apexchartsOptions.theme.mode = "light";
-      // apexchartsOptions.chart.background = "#fff";
       chart.updateOptions({
         theme: {
           mode: "light",
@@ -253,22 +227,11 @@
   // ********************************************
   //  New gauge section start
   // ********************************************
-  // const colorsArray = ["#07bbec", "#f6ffa3", "#e8ec07", "#ec8107", "#ec0707"];
-  // для цвета: сделать массив значений, выборку делать делением текущего значения переменной на количество элементов нацело оператор (%)
-
 
   const setGaugeMode = (mode) => {
     // 1 for (-50 0 50)
     // 2 for (20 100)
     gaugeMode = mode;
-    // // ************ automatic gaugeMode set start
-    // if (temp >= 50) {
-    //   gaugeMode = 2;
-    // }
-    // if (temp <= 20) {
-    //   gaugeMode = 1;
-    // }
-    // ************ automatic gaugeMode set end
     const mFiftyToFifty = document.getElementById("numbers50-50");
     const twentyToHundred = document.getElementById("numbers20-100");
     if (mode === 2) {
@@ -349,7 +312,6 @@
 
   document.querySelector(".gauge_block").onclick = () => {
     gaugeMode === 2 ? setGauge(tempNum, 1) : setGauge(tempNum, 2);
-    refresh();
   };
 
   const setGauge = (temp, mode) => {
@@ -361,13 +323,11 @@
     } else {
       setGaugeMode(mode);
     }
-    // setGaugeMode(mode);
     setGaugeThemperatureNumber(temp);
     setGaugeArrowAngle(temp);
     setGaugeArcLine(temp);
   };
 
-  // setGauge(tempNum, 2); // set gauge value
   // ********************************************
   //  New gauge section end
   // ********************************************
@@ -386,7 +346,7 @@
   // "#btn-rb" "#btn-lb" "#btn-lt"
   // "#refresh-icon"
   //
-document.querySelector("#refresh-icon").onclick = () => {console.log("refresh")};
+document.querySelector("#refresh-icon").onclick = () => {refresh()};
 // важная заметка - для нормальной отработки события нужно пихать все дополнительные элементы внутрь <g>...</g> и уже ему назначать id + css + onclick
 
 }.call(this));
