@@ -29,7 +29,7 @@ DallasTemperature sensors(&oneWire);
 #define RELAY LED_BUILTIN                                               // Пин подключения сигнального контакта реле
 #define TEMP_REFRESH_PERIOD 10 //5
 #define GRAPH_WRITE_DIVIDER 6 //6
-#define GRAPH_LEN 2880 //300
+#define GRAPH_LEN 1440 //300
 
 
 int graphData[GRAPH_LEN];
