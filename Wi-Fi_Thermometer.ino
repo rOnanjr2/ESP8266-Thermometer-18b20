@@ -7,12 +7,14 @@
 #include <DallasTemperature.h>
 #include "secrets.h"
 #include <FastBot.h>
+#include <EEPROM.h>
 
 #define RELAY LED_BUILTIN                                               // Встроенный светодиоддиод
-#define TEMP_REFRESH_PERIOD 10
-#define GRAPH_WRITE_DIVIDER 6 
+// #define TEMP_REFRESH_PERIOD 10
+// #define GRAPH_WRITE_DIVIDER 6 
 #define GRAPH_LEN 1440 
 #define ONE_WIRE_BUS 13
+#define EEPROM_SIZE 64
 
 FastBot bot(SECRET_TOKEN);
 OneWire oneWire(ONE_WIRE_BUS);
@@ -20,17 +22,20 @@ DallasTemperature sensors(&oneWire);
 ESP8266WebServer HTTP(80);                                              // Определяем объект и порт сервера для работы с HTTP
 FtpServer ftpSrv;                                                       // Определяем объект для работы с модулем по FTP (для отладки HTML)
 
-int alarmTempHi = 27;
-int alarmTempLow = 22;
-bool alarmOn = true;
+int alarmTempHi;
+int alarmTempLow;
+int graphData[GRAPH_LEN];
+int address = 0;
+bool alarmOn;
 bool alarmReseted = false;
 bool alarmFirst = true;
-int graphData[GRAPH_LEN];
+uint8_t graphWriteDiv;
+uint8_t graphWriteDivider = 6;
+int tempRefreshPeriod = 10;
 uint16_t graphPointer;
 uint16_t sendPointer;  
 unsigned long timing;
 float temperatureC;
-byte graphWriteDivider;
 
 void setup() {
   pinMode(RELAY, OUTPUT);                                                // Определяем пин реле как исходящий
@@ -55,6 +60,10 @@ void setup() {
   ftpSrv.begin("relay","relay");                                        // Поднимаем FTP-сервер для удобства отладки работы HTML (логин: relay, пароль: relay)
   sensors.begin();
   bot.attach(newMsg);
+
+  EEPROM.begin(EEPROM_SIZE);
+  // saveSettings();
+  loadSettings();
 
   // HTTP.on("/relay_switch", [](){                                        // При HTTP запросе вида http://192.168.4.1/relay_switch
   //     HTTP.send(200, "text/plain", relay_switch());                     // Отдаём клиенту код успешной обработки запроса, сообщаем, что формат ответа текстовый и возвращаем результат выполнения функции relay_switch 
@@ -83,9 +92,38 @@ void loop() {
     // digitalWrite(RELAY, 1);
     HTTP.handleClient();                                                // Обработчик HTTP-событий (отлавливает HTTP-запросы к устройству и обрабатывает их в соответствии с выше описанным алгоритмом)
     ftpSrv.handleFTP();                                                 // Обработчик FTP-соединений  
-    tempCheck(TEMP_REFRESH_PERIOD);
+    tempCheck(tempRefreshPeriod);
     // digitalWrite(RELAY, 0);
     bot.tick();
+  }
+
+  void loadSettings() {
+    address = 0;
+    EEPROM.get(address, graphWriteDivider);
+    address += sizeof(graphWriteDivider);
+    EEPROM.get(address, tempRefreshPeriod);
+    address += sizeof(tempRefreshPeriod);
+    EEPROM.get(address, alarmOn);
+    address += sizeof(alarmOn);
+    EEPROM.get(address, alarmTempHi);
+    address += sizeof(alarmTempHi);
+    EEPROM.get(address, alarmTempLow);
+    address += sizeof(alarmTempLow);
+  }
+
+  void saveSettings() {
+    address = 0;
+    EEPROM.put(address, graphWriteDivider);
+    address += sizeof(graphWriteDivider);
+    EEPROM.put(address, tempRefreshPeriod);
+    address += sizeof(tempRefreshPeriod);
+    EEPROM.put(address, alarmOn);
+    address += sizeof(alarmOn);
+    EEPROM.put(address, alarmTempHi);
+    address += sizeof(alarmTempHi);
+    EEPROM.put(address, alarmTempLow);
+    address += sizeof(alarmTempLow);
+    EEPROM.commit();
   }
 
   void telegramAlarm() {
@@ -158,7 +196,14 @@ void newMsg(FB_msg& msg) {
   }else if (command == "help" || command == "/help")
   {
     bot.setTextMode(FB_MARKDOWN);
-    bot.sendMessage(F( "Список команд:\n`t`, `temp` - Возвращает температуру на датчике\n`alarm status` - Статус уведомлений\n`alarm on` - Включает уведомление по превышению температуры\n`alarm off` - Отключает уведомление по превышению температуры\n`alarm set` - Задает температуру в формате `alarm set XX XX`\n`id` - Узнать ID чата"), msg.chatID);
+    bot.sendMessage(F(
+      "Список команд:\n"
+      "`t`, `temp` - Возвращает температуру на датчике\n"
+      "`alarm status` - Статус уведомлений\n"
+      "`alarm on` - Включает уведомление по превышению температуры\n"
+      "`alarm off` - Отключает уведомление по превышению температуры\n"
+      "`alarm set` - Задает температуру в формате `alarm set XX XX`\n"
+      "`id` - Узнать ID чата"), msg.chatID);
   }else if (command == "t" || command == "temp")
   {
     bot.sendMessage("Температура на датчике: " + String(temperatureC) + "°C", msg.chatID);
@@ -166,6 +211,23 @@ void newMsg(FB_msg& msg) {
   {
     alarmReseted = true;
     bot.sendMessage("Уведомление приостановлено", msg.chatID);
+  }else if (command == "settings load")
+  {
+    loadSettings();
+    bot.sendMessage("Настройки загружены", msg.chatID);
+  }else if (command == "settings save")
+  {
+    saveSettings();
+    bot.sendMessage("Настройки сохранены", msg.chatID);
+  }else if (command == "settings")
+  {
+    bot.sendMessage(
+      "Настройки:\n"
+      "Период обновления температуры - " + String(tempRefreshPeriod) + " сек.\n"
+      "Делитель записи графика - " + String(graphWriteDivider) + "\n"
+      "Уведомления " + String(alarmOn ? "включены" : "выключены") + "\n"
+      "Нижняя температура - " + String(alarmTempLow) + "°C\n"
+      "Верхняя температура - " + String(alarmTempHi) + "°C", msg.chatID);
   }else {
     bot.sendMessage("Неизвестная команда. Пиши `help` для справки", msg.chatID);
   }  
@@ -178,12 +240,12 @@ void tempCheck(unsigned int t) {
     timing = timing - (timing % 10);                                     // Округляем тайминг для большей точности
     sensors.requestTemperatures();                                       // Запрашиваем вычисление температуры
     temperatureC = sensors.getTempCByIndex(0);                           // Получаем значение температуры в переменную
-    if (graphWriteDivider < GRAPH_WRITE_DIVIDER - 1)
+    if (graphWriteDiv < graphWriteDivider - 1)
     {
-      graphWriteDivider++;
+      graphWriteDiv++;
     }else{
       writeGraph();
-      graphWriteDivider = 0;
+      graphWriteDiv = 0;
       telegramAlarm();
     }
   }
@@ -202,8 +264,8 @@ String sendGraph() {
   }
   return str + "," + 
   graphPointer + "," + 
-  TEMP_REFRESH_PERIOD + "," + 
-  GRAPH_WRITE_DIVIDER;
+  tempRefreshPeriod + "," + 
+  graphWriteDivider;
 }
 
 void writeGraph() {
