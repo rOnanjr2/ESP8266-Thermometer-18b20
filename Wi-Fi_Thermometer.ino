@@ -169,7 +169,7 @@ void newMsg(FB_msg& msg) {
   }else if (command == "id")
   {
     bot.sendMessage(msg.chatID, msg.chatID);
-  }else if (command == "alarm status")
+  }else if (command == "alarm status" || command == "alarm")
   {
     if (alarmOn)
     {
@@ -181,8 +181,8 @@ void newMsg(FB_msg& msg) {
   {
     alarmOn = true;
     alarmReseted = false;
-    alarmTempLow = msg.text.substring(10, 12).toInt();  //alarm set 22 27
-    alarmTempHi = msg.text.substring(13, 15).toInt();
+    alarmTempLow = command.substring(10, 12).toInt();  //alarm set 22 27
+    alarmTempHi = command.substring(13, 15).toInt();
     bot.sendMessage("Уведомление включено, установлена температура: "  + String(alarmTempLow) + "-" + String(alarmTempHi) + "°C", msg.chatID);
   }else if (command == "alarm off")
   {
@@ -199,10 +199,16 @@ void newMsg(FB_msg& msg) {
     bot.sendMessage(F(
       "Список команд:\n"
       "`t`, `temp` - Возвращает температуру на датчике\n"
-      "`alarm status` - Статус уведомлений\n"
+      "`alarm, alarm status` - Статус уведомлений\n"
       "`alarm on` - Включает уведомление по превышению температуры\n"
       "`alarm off` - Отключает уведомление по превышению температуры\n"
-      "`alarm set` - Задает температуру в формате `alarm set XX XX`\n"
+      "`ok` - Приостановить уведомления\n"
+      "`alarm set XX XX` - Задает температуру. XX - двузначное число\n"
+      "`set global XX XX` - Настройки опроса датчика. Внимание - это перезагрузит устройство\n"
+      "`reboot` - Перезагрузка\n"
+      "`settings` - Показать настройки\n"
+      "`settings load` - Загрузить настройки из ПЗУ\n"
+      "`settings save` - Сохранить настройки в ПЗУ\n"
       "`id` - Узнать ID чата"), msg.chatID);
   }else if (command == "t" || command == "temp")
   {
@@ -228,9 +234,25 @@ void newMsg(FB_msg& msg) {
       "Уведомления " + String(alarmOn ? "включены" : "выключены") + "\n"
       "Нижняя температура - " + String(alarmTempLow) + "°C\n"
       "Верхняя температура - " + String(alarmTempHi) + "°C", msg.chatID);
+  }else if (command == "reboot")
+  {
+    reboot(msg.chatID);
+  }else if (command.substring(0, 10) == "set global")
+  {
+    tempRefreshPeriod = command.substring(11, 13).toInt();
+    graphWriteDivider = command.substring(14, 16).toInt();
+    saveSettings();
+    reboot(msg.chatID);
   }else {
     bot.sendMessage("Неизвестная команда. Пиши `help` для справки", msg.chatID);
   }  
+}
+
+
+void reboot(String id) {
+  bot.tickManual();
+  bot.sendMessage("Перезагрузка...", id);
+  ESP.restart();
 }
 
 void tempCheck(unsigned int t) {
