@@ -27,7 +27,7 @@
   };
 
   let dataset = [];
-  const datasetShifted = [];
+  let datasetShifted = [];
 
   const apexchartsOptions = {
     series: [
@@ -146,13 +146,16 @@
         drawGraph(request.responseText);
       }
     };
-    // request.onerror = function () {
-    //   drawGraph(graphStr);
-    // };
+    request.onerror = function () {
+      drawGraph(graphStr);
+    };
     request.send();
   };
 
   const refresh = () => {
+    dataset = [];
+    datasetShifted = [];
+    datesTempArr = [];
     requestTemp();
     requestGraph();
   };
@@ -244,18 +247,20 @@
     }
   };
 
-  const setGaugeThemperatureNumber = (num) => {
+    const setGaugeThemperatureNumber = (num) => {
+    let temp = num.toFixed(1).toString();
     let maxChar;
     const gaugeThemperatureNumber =
       document.getElementById("temperature-digit");
     // ************** set output digits count
-    if (num.toString().includes(".") && !num.toString().includes("-")) {
+    if (temp.includes(".") && !temp.includes("-")) {
       maxChar = 4;
     } else {
       maxChar = 3;
     }
-    gaugeThemperatureNumber.innerText = num.toString().substring(0, maxChar);
+    gaugeThemperatureNumber.innerText = temp.substring(0, maxChar);
   };
+
 
   const setGaugeArrowAngle = (num) => {
     const gaugeArrow = document.getElementById("white-arrow");
