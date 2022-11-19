@@ -247,7 +247,7 @@
     }
   };
 
-    const setGaugeThemperatureNumber = (num) => {
+  const setGaugeThemperatureNumber = (num) => {
     let temp = num.toFixed(1).toString();
     let maxChar;
     const gaugeThemperatureNumber =
@@ -351,7 +351,18 @@
   // "#btn-rb" "#btn-lb" "#btn-lt"
   // "#refresh-icon"
   //
-document.querySelector("#refresh-icon").onclick = () => {refresh()};
-// важная заметка - для нормальной отработки события нужно пихать все дополнительные элементы внутрь <g>...</g> и уже ему назначать id + css + onclick
+  const refreshBtn = document.querySelector("#refresh-icon");
+  refreshBtn.onclick = () => {
+    const icon = refreshBtn.querySelector("img");
+    let rotation = icon.style.rotate;
+    if (rotation === "") {
+      icon.style.rotate = -180 + "deg";
+    }
+    else {
+      icon.style.rotate = parseInt(rotation.slice(0, -3)) - 180 + "deg";
+    }
+    refresh();
+  };
+  // важная заметка - для нормальной отработки события нужно пихать все дополнительные элементы внутрь <g>...</g> и уже ему назначать id + css + onclick
 
 }.call(this));

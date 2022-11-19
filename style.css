@@ -94,11 +94,10 @@ h1 {
   width: 80%;
   max-width: 500px;
   cursor: pointer;
-  margin: 0 0 3vh;
+  margin: 0 0 -5vh;
   /* display: flex;
   flex-direction: row;
   align-items:center; */
-
 }
 svg {
   display: block;
@@ -124,7 +123,7 @@ svg #progress-blue-circle {
   transform: rotate(30deg);
 }
 /* glowing strength */
-svg #progress-blue-circle:nth-child(1){
+svg #progress-blue-circle:nth-child(1) {
   stroke-width: 7px;
 }
 /* DO NOT DELETE */
@@ -146,20 +145,30 @@ svg #white-arrow {
   transform-origin: center;
   /* transform: rotate(calc(240deg / 100 * var(--num))); */
 }
-.gauge_block{
+.gauge_block {
   position: relative;
 }
 /* // gauge buttons */
-#gauge_btns {
-  position: absolute;
-  z-index: 11;
-transform: translateY(-80%);
+#refresh-icon img{
+ height: 90%;
+ transition: 0.5s;
 }
-
-#refresh-icon:hover > #btn-rt, #btn-lb:hover, #btn-lt:hover, #btn-rb:hover{
-  fill: #444 !important;
+#refresh-icon{
+  padding-top: 4px;
+  /* background-color: #1b1b1b; */
+  color: #dadada;
+  display: inline-block;
+  width: 22%;
+  height: 7vh;
+  /* font-size: 3vh; */
+  border:none;
+  background-color: transparent;
+  position: relative;
+  top: -9vh;
+  text-align: right;
+  right:-45%;
+  cursor: pointer;
 }
-
 
 
 #tempSlider {
