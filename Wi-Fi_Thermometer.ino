@@ -5,50 +5,43 @@
 #include <WiFiClient.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
+#include "secrets.h"
 #include <FastBot.h>
-#define BOT_TOKEN "5676046919:AAFdLuQlrTZgJvfhireLvHfxfen8W8RpYgY"
-FastBot bot(BOT_TOKEN);
+#include <EEPROM.h>
 
-#ifndef STASSID
-#define STASSID "Wi-Fi"
-#define STAPSK  "renegade"
-#endif
+#define RELAY LED_BUILTIN                                               // Встроенный светодиоддиод
+// #define TEMP_REFRESH_PERIOD 10
+// #define GRAPH_WRITE_DIVIDER 6 
+#define GRAPH_LEN 1440 
+#define ONE_WIRE_BUS 13
+#define EEPROM_SIZE 64
 
-const char *ssid = STASSID;
-const char *password = STAPSK;
-
-const int oneWireBus = 13;    
-unsigned long timing;
-float temperatureC;
-
-
-OneWire oneWire(oneWireBus);
+FastBot bot(SECRET_TOKEN);
+OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-
-#define RELAY LED_BUILTIN                                               // Пин подключения сигнального контакта реле
-#define TEMP_REFRESH_PERIOD 10 //5
-#define GRAPH_WRITE_DIVIDER 6 //6
-#define GRAPH_LEN 1440 //300
-
-
-int graphData[GRAPH_LEN];
-
-uint16_t graphPointer;
-uint16_t sendPointer;
-
-byte graphWriteDivider;
-
 ESP8266WebServer HTTP(80);                                              // Определяем объект и порт сервера для работы с HTTP
 FtpServer ftpSrv;                                                       // Определяем объект для работы с модулем по FTP (для отладки HTML)
 
-void setup() {
+int alarmTempHi;
+int alarmTempLow;
+int graphData[GRAPH_LEN];
+int address = 0;
+bool alarmOn;
+bool alarmReseted = false;
+bool alarmFirst = true;
+uint8_t graphWriteDiv;
+uint8_t graphWriteDivider = 6;
+int tempRefreshPeriod = 10;
+uint16_t graphPointer;
+uint16_t sendPointer;  
+unsigned long timing;
+float temperatureC;
 
+void setup() {
   pinMode(RELAY, OUTPUT);                                                // Определяем пин реле как исходящий
   Serial.begin(9600);    
-  
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SECRET_SSID, SECRET_PASS);
   Serial.println("");
 
   // Wait for connection
@@ -59,17 +52,18 @@ void setup() {
 
   Serial.println("");
   Serial.print("Connected to ");
-  Serial.println(ssid);
+  Serial.println(SECRET_SSID);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());                                       // Инициализируем вывод данных на серийный порт со скоростью 9600 бод
   SPIFFS.begin();                                                       // Инициализируем работу с файловой системой                          
   HTTP.begin();                                                         // Инициализируем Web-сервер
   ftpSrv.begin("relay","relay");                                        // Поднимаем FTP-сервер для удобства отладки работы HTML (логин: relay, пароль: relay)
   sensors.begin();
-
-
-
   bot.attach(newMsg);
+
+  EEPROM.begin(EEPROM_SIZE);
+  // saveSettings();
+  loadSettings();
 
   // HTTP.on("/relay_switch", [](){                                        // При HTTP запросе вида http://192.168.4.1/relay_switch
   //     HTTP.send(200, "text/plain", relay_switch());                     // Отдаём клиенту код успешной обработки запроса, сообщаем, что формат ответа текстовый и возвращаем результат выполнения функции relay_switch 
@@ -88,8 +82,6 @@ void setup() {
       HTTP.send(200, "text/plain", sendGraph());                        // Отдаём клиенту код успешной обработки запроса, сообщаем, что формат ответа текстовый и возвращаем массив с графиком
     });
 
-
-
   HTTP.onNotFound([](){                                                 // Описываем действия при событии "Не найдено"
   if(!handleFileRead(HTTP.uri()))                                       // Если функция handleFileRead (описана ниже) возвращает значение false в ответ на поиск файла в файловой системе
       HTTP.send(404, "text/plain", "Not Found");                        // возвращаем на запрос текстовое сообщение "File isn't found" с кодом 404 (не найдено)
@@ -100,49 +92,187 @@ void loop() {
     // digitalWrite(RELAY, 1);
     HTTP.handleClient();                                                // Обработчик HTTP-событий (отлавливает HTTP-запросы к устройству и обрабатывает их в соответствии с выше описанным алгоритмом)
     ftpSrv.handleFTP();                                                 // Обработчик FTP-соединений  
-    tempCheck(TEMP_REFRESH_PERIOD);
+    tempCheck(tempRefreshPeriod);
     // digitalWrite(RELAY, 0);
     bot.tick();
   }
 
+  void loadSettings() {
+    address = 0;
+    EEPROM.get(address, graphWriteDivider);
+    address += sizeof(graphWriteDivider);
+    EEPROM.get(address, tempRefreshPeriod);
+    address += sizeof(tempRefreshPeriod);
+    EEPROM.get(address, alarmOn);
+    address += sizeof(alarmOn);
+    EEPROM.get(address, alarmTempHi);
+    address += sizeof(alarmTempHi);
+    EEPROM.get(address, alarmTempLow);
+    address += sizeof(alarmTempLow);
+  }
+
+  void saveSettings() {
+    address = 0;
+    EEPROM.put(address, graphWriteDivider);
+    address += sizeof(graphWriteDivider);
+    EEPROM.put(address, tempRefreshPeriod);
+    address += sizeof(tempRefreshPeriod);
+    EEPROM.put(address, alarmOn);
+    address += sizeof(alarmOn);
+    EEPROM.put(address, alarmTempHi);
+    address += sizeof(alarmTempHi);
+    EEPROM.put(address, alarmTempLow);
+    address += sizeof(alarmTempLow);
+    EEPROM.commit();
+  }
+
+  void telegramAlarm() {
+  if (temperatureC >= alarmTempHi && alarmOn && !alarmReseted)          // Если температура выше нормы, уведомления включены и не были сброшены
+  {
+    if (alarmFirst)
+    {
+      alarmFirst = false;
+    }else{
+      bot.deleteMessage(bot.lastBotMsg(), SECRET_MYID);
+    }
+    bot.sendMessage("Внимание! Температура превысила норму: " + String(temperatureC) + "°C", SECRET_MYID);
+  }else if (temperatureC <= alarmTempLow && alarmOn && !alarmReseted)   // Если ниже выше нормы, уведомления включены и не были сброшены
+  {
+    if (alarmFirst)
+    {
+      alarmFirst = false;
+    }else{
+      bot.deleteMessage(bot.lastBotMsg(), SECRET_MYID);
+    }
+    bot.sendMessage("Внимание! Температура ниже нормы: " + String(temperatureC) + "°C", SECRET_MYID);
+  }else if (temperatureC < alarmTempHi && alarmReseted && temperatureC > alarmTempLow && alarmReseted)
+  {                                                                     // Приостановка уведомлений
+    bot.sendMessage("Температура в норме", SECRET_MYID);
+    alarmReseted = false;
+  }
+}
 
 void newMsg(FB_msg& msg) {
   // выводим всю информацию о сообщении
-  Serial.println(msg.toString());
+  // Serial.println(msg.toString());
   // if (msg.OTA && msg.text == "update14473") {
+  bot.setTextMode(FB_TEXT);
+  String command = msg.text;
+  command.toLowerCase();
   if (msg.OTA) {
     bot.update();
-  }else if (msg.text.substring(0, 5) == "spirt") {
-    uint8_t a = msg.text.substring(6, 8).toInt();
-    uint8_t b = msg.text.substring(9, 11).toInt();
+  }else if (command.substring(0, 5) == "spirt") {
+    uint8_t a = command.substring(6, 8).toInt();
+    uint8_t b = command.substring(9, 11).toInt();
     float result = a + (20 - b) * 0.3;
     bot.sendMessage("содержание спирта: " + String(result) + " %об.", msg.chatID);
+  }else if (command == "id")
+  {
+    bot.sendMessage(msg.chatID, msg.chatID);
+  }else if (command == "alarm status" || command == "alarm")
+  {
+    if (alarmOn)
+    {
+      bot.sendMessage("Уведомление включено, установлена температура: "  + String(alarmTempLow) + "-" + String(alarmTempHi) + "°C", msg.chatID);
+    }else {
+      bot.sendMessage("Уведомление отключено", msg.chatID);
+    }
+  }else if (command.substring(0, 9) == "alarm set")
+  {
+    alarmOn = true;
+    alarmReseted = false;
+    alarmTempLow = command.substring(10, 12).toInt();  //alarm set 22 27
+    alarmTempHi = command.substring(13, 15).toInt();
+    bot.sendMessage("Уведомление включено, установлена температура: "  + String(alarmTempLow) + "-" + String(alarmTempHi) + "°C", msg.chatID);
+  }else if (command == "alarm off")
+  {
+    alarmOn = false;
+    bot.sendMessage("Уведомление отключено", msg.chatID);
+  }else if (command == "alarm on")
+  {
+    alarmOn = true;
+    alarmReseted = false;
+    bot.sendMessage("Уведомление включено, установлена температура: "  + String(alarmTempLow) + "-" + String(alarmTempHi) + "°C", msg.chatID);
+  }else if (command == "help" || command == "/help")
+  {
+    bot.setTextMode(FB_MARKDOWN);
+    bot.sendMessage(F(
+      "Список команд:\n"
+      "`t`, `temp` - Возвращает температуру на датчике\n"
+      "`alarm, alarm status` - Статус уведомлений\n"
+      "`alarm on` - Включает уведомление по превышению температуры\n"
+      "`alarm off` - Отключает уведомление по превышению температуры\n"
+      "`ok` - Приостановить уведомления\n"
+      "`alarm set XX XX` - Задает температуру. XX - двузначное число\n"
+      "`set global XX XX` - Настройки опроса датчика. Внимание - это перезагрузит устройство\n"
+      "`reboot` - Перезагрузка\n"
+      "`settings` - Показать настройки\n"
+      "`settings load` - Загрузить настройки из ПЗУ\n"
+      "`settings save` - Сохранить настройки в ПЗУ\n"
+      "`id` - Узнать ID чата"), msg.chatID);
+  }else if (command == "t" || command == "temp")
+  {
+    bot.sendMessage("Температура на датчике: " + String(temperatureC) + "°C", msg.chatID);
+  }else if (command == "ok")
+  {
+    alarmReseted = true;
+    bot.sendMessage("Уведомление приостановлено", msg.chatID);
+  }else if (command == "settings load")
+  {
+    loadSettings();
+    bot.sendMessage("Настройки загружены", msg.chatID);
+  }else if (command == "settings save")
+  {
+    saveSettings();
+    bot.sendMessage("Настройки сохранены", msg.chatID);
+  }else if (command == "settings")
+  {
+    bot.sendMessage(
+      "Настройки:\n"
+      "Период обновления температуры - " + String(tempRefreshPeriod) + " сек.\n"
+      "Делитель записи графика - " + String(graphWriteDivider) + "\n"
+      "Уведомления " + String(alarmOn ? "включены" : "выключены") + "\n"
+      "Нижняя температура - " + String(alarmTempLow) + "°C\n"
+      "Верхняя температура - " + String(alarmTempHi) + "°C", msg.chatID);
+  }else if (command == "reboot")
+  {
+    reboot(msg.chatID);
+  }else if (command.substring(0, 10) == "set global")
+  {
+    tempRefreshPeriod = command.substring(11, 13).toInt();
+    graphWriteDivider = command.substring(14, 16).toInt();
+    saveSettings();
+    reboot(msg.chatID);
   }else {
-
-  // отправить сообщение обратно
-  bot.sendMessage("Температура на датчике 1: " + String(temperatureC) + "°C", msg.chatID);
+    bot.sendMessage("Неизвестная команда. Пиши `help` для справки", msg.chatID);
   }  
 }
 
+
+void reboot(String id) {
+  bot.tickManual();
+  bot.sendMessage("Перезагрузка...", id);
+  ESP.restart();
+}
+
 void tempCheck(unsigned int t) {
-      digitalWrite(RELAY, 0);
+  digitalWrite(RELAY, 0);
   if (millis() - timing > t * 1000){                                     // Проверяем миллис на прошедшее время
     timing = millis();                                                   // Обновляем время прошлого срабатывания
     timing = timing - (timing % 10);                                     // Округляем тайминг для большей точности
     sensors.requestTemperatures();                                       // Запрашиваем вычисление температуры
     temperatureC = sensors.getTempCByIndex(0);                           // Получаем значение температуры в переменную
-    if (graphWriteDivider < GRAPH_WRITE_DIVIDER - 1)
+    if (graphWriteDiv < graphWriteDivider - 1)
     {
-      graphWriteDivider++;
+      graphWriteDiv++;
     }else{
       writeGraph();
-      graphWriteDivider = 0;
+      graphWriteDiv = 0;
+      telegramAlarm();
     }
   }
-      digitalWrite(RELAY, 1);
+  digitalWrite(RELAY, 1);
 }
-
-
 
 String sendGraph() {
   String str;
@@ -156,45 +286,24 @@ String sendGraph() {
   }
   return str + "," + 
   graphPointer + "," + 
-  TEMP_REFRESH_PERIOD + "," + 
-  GRAPH_WRITE_DIVIDER;
+  tempRefreshPeriod + "," + 
+  graphWriteDivider;
 }
-
-
 
 void writeGraph() {
   if (graphPointer < GRAPH_LEN - 1)
+  {
+    graphData[graphPointer] = int(temperatureC*10);
+    graphPointer++;
+    if (sendPointer < GRAPH_LEN)
     {
-      graphData[graphPointer] = int(temperatureC*10);
-      graphPointer++;
-      if (sendPointer < GRAPH_LEN)
-      {
-        sendPointer++;
-      }
-    }else{
-      graphData[graphPointer] = int(temperatureC*10);
-      graphPointer = 0;
+      sendPointer++;
     }
+  }else{
+    graphData[graphPointer] = int(temperatureC*10);
+    graphPointer = 0;
+  }
 }
-
-// String relay_switch() {                                                 // Функция переключения реле 
-//   byte state;
-//   if (digitalRead(RELAY))                                               // Если на пине реле высокий уровень   
-//     state = 0;                                                          //  то запоминаем, что его надо поменять на низкий
-//   else                                                                  // иначе
-//     state = 1;                                                          //  запоминаем, что надо поменять на высокий
-//   digitalWrite(RELAY, state);                                           // меняем значение на пине подключения реле
-//   return String(state);                                                 // возвращаем результат, преобразовав число в строку
-// }
-
-// String relay_status() {                                                 // Функция для определения текущего статуса реле 
-//   byte state;
-//   if (digitalRead(RELAY))                                               // Если на пине реле высокий уровень   
-//     state = 1;                                                          //  то запоминаем его как единицу
-//   else                                                                  // иначе
-//     state = 0;                                                          //  запоминаем его как ноль
-//   return String(state);                                                 // возвращаем результат, преобразовав число в строку
-// }
 
 bool handleFileRead(String path){                                       // Функция работы с файловой системой
   if(path.endsWith("/")) path += "index.html";                          // Если устройство вызывается по корневому адресу, то должен вызываться файл index.html (добавляем его в конец адреса)
